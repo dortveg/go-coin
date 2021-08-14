@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-func getAveVol(pair string) float64 {
-	url := "https://api.binance.com/api/v3/klines?symbol=" + pair + "&interval=1h&startTime=" + getOldTS() + "&endTime=" + getPrevTS()
+func getlastClose(pair string) float64 {
+	url := "https://api.binance.com/api/v3/klines?symbol=" + pair + "&interval=1h&startTime=" + getLastTS() + "&endTime=" + getPrevTS()
 
 	response, err := http.Get(url)
 
@@ -28,15 +28,12 @@ func getAveVol(pair string) float64 {
 	resStr := string(responseData)
 	conv1 := strings.ReplaceAll(resStr, "\"", "")
 	conv2 := strings.Split(conv1, ",")
-	vol1, _ := strconv.ParseFloat(conv2[5], 64)
-	vol2, _ := strconv.ParseFloat(conv2[17], 64)
-	vol3, _ := strconv.ParseFloat(conv2[29], 64)
-	aveVol := (vol1 + vol2 + vol3) / 3
-	return aveVol
+	close, _ := strconv.ParseFloat(conv2[4], 64)
+	return close
 }
 
-func getCurVol(pair string) float64 {
-	url := "https://api.binance.com/api/v3/klines?symbol=" + pair + "&interval=1h&startTime=" + getPrevTS() + "&endTime=" + getCurTS()
+func getWeekClose(pair string) float64 {
+	url := "https://api.binance.com/api/v3/klines?symbol=" + pair + "&interval=1h&startTime=" + getWeekTS1() + "&endTime=" + getWeekTS2()
 
 	response, err := http.Get(url)
 
@@ -53,11 +50,41 @@ func getCurVol(pair string) float64 {
 	resStr := string(responseData)
 	conv1 := strings.ReplaceAll(resStr, "\"", "")
 	conv2 := strings.Split(conv1, ",")
-	vol, _ := strconv.ParseFloat(conv2[5], 64)
-	return vol
+	close, _ := strconv.ParseFloat(conv2[4], 64)
+	return close
 }
 
-func get24hrPercent(pair string) float64 {
+func getDif(cur float64, prev float64, dp int) string {
+	white := "\033[0m"
+	red := "\033[31m"
+	green := "\033[32m"
+
+	dif := (cur - prev) / prev
+
+	if dp == 3 {
+		if dif > 0 {
+			p := dif * 100
+			st := fmt.Sprintf("%v+%0.3f", green, p)
+			return (st + white)
+		} else {
+			p := dif * 100
+			st := fmt.Sprintf("%v%0.3f", red, p)
+			return (st + white)
+		}
+	} else {
+		if dif > 0 {
+			p := dif * 100
+			st := fmt.Sprintf("%v+%0.2f", green, p)
+			return (st + white)
+		} else {
+			p := dif * 100
+			st := fmt.Sprintf("%v%0.2f", red, p)
+			return (st + white)
+		}
+	}
+}
+
+func get24hrPercent(pair string) string {
 	url := "https://api.binance.com/api/v3/ticker/24hr?symbol=" + pair
 
 	response, err := http.Get(url)
@@ -72,12 +99,22 @@ func get24hrPercent(pair string) float64 {
 		log.Fatal(err)
 	}
 
+	white := "\033[0m"
+	red := "\033[31m"
+	green := "\033[32m"
+
 	resStr := string(responseData)
 	conv1 := strings.ReplaceAll(resStr, "\"", "")
 	conv2 := strings.Split(conv1, ",")
 	pcpStr := strings.TrimPrefix(conv2[2], "priceChangePercent:")
 	pcp, _ := strconv.ParseFloat(pcpStr, 64)
-	return pcp
+	if pcp > 0 {
+		cpp := fmt.Sprintf("%v+%0.2f", green, pcp)
+		return (cpp + white)
+	} else {
+		cpp := fmt.Sprintf("%v%0.2f", red, pcp)
+		return (cpp + white)
+	}
 }
 
 func getPrice(pair string) float64 {

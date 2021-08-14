@@ -18,37 +18,38 @@ package main
 
 import (
 	"fmt"
-	//"strings"
+	"time"
+
+	tm "github.com/buger/goterm"
 )
 
 func main() {
+	tm.Clear()
 
-	// var btc coin = {
-	// 	name: "BTCUSDT",
-	// 	index: 0,
-	// 	curPrice: 0,
-	// 	prevPrice: 0,
-	// 	curVol: 0,
-	// 	prevVol: 0,
-	// 	aveVolMin: 0,
-	// 	oneMinTicks: []uint8{},
-	// 	fiveMinTicks: []uint8{},
-	// 	logs: []string{},
-	// 	alertType: "none",
-	// 	alertPrice: 0,
-	// }
+	for {
+		ui := tm.NewBox(50|tm.PCT, 18, 0)
 
-	nano := newCoin("NANOUSDT", 0)
-	coins = append(coins, nano)
+		fmt.Fprintln(ui, " Pair       Price        1hr       24hr      7d     ")
+		fmt.Fprintln(ui, " -------------------------------------------------- ")
+		fmt.Fprintln(ui, "                                                    ")
+		for _, coin := range coins {
+			lc := getlastClose(coin)
+			wc := getWeekClose(coin)
+			price := getPrice(coin)
+			dpp := get24hrPercent(coin)
+			hpp := getDif(price, lc, 3)
+			wpp := getDif(price, wc, 2)
+			fmt.Fprintf(ui, " %v  %v    %v    %v    %v \n", coin, price, hpp, dpp, wpp)
+			fmt.Fprintln(ui, "                                                    ")
+		}
 
-	fmt.Println(coins)
-	// price := getPrice("ETHUSDT")
-	// fmt.Println(price)
-	// ave := getAveVol("ETHUSDT")
-	// cur := getCurVol("ETHUSDT")
-	// fmt.Printf("the ave is: %v, the cur is: %v", ave, cur)
-	get24hrPercent("ETHUSDT")
-	// fmt.Println("------------------")
+		tm.Print(tm.MoveTo(ui.String(), 1|tm.PCT, 5|tm.PCT))
 
-	//addCoin()
+		tm.Flush()
+
+		time.Sleep(time.Second * 3)
+
+		// addCoin()
+		// deleteCoin()
+	}
 }
