@@ -1,37 +1,43 @@
-// 		<> - Crypto price/volume momentum tracker
-// 		Copyright (C) 2021  George Tevdo
-
-// 		This program is free software: you can redistribute it and/or modify
-// 		it under the terms of the GNU Affero General Public License as published
-// 		by the Free Software Foundation, either version 3 of the License, or
-// 		(at your option) any later version.
-
-// 		This program is distributed in the hope that it will be useful,
-// 		but WITHOUT ANY WARRANTY; without even the implied warranty of
-// 		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// 		GNU Affero General Public License for more details.
-
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	tm "github.com/buger/goterm"
 )
 
-func main() {
+func prompt() {
+	var input string
+
+	fmt.Print("Welcome. Type 'a' - add a coin, 's' - start, 'd' - delete a coin: ")
+	fmt.Scanln(&input)
+	trm := strings.TrimSpace(input)
+	choice := strings.ToUpper(trm)
+
+	switch choice {
+	case "A":
+		addCoin()
+	case "S":
+		startTracking()
+	case "D":
+		deleteCoin()
+	default:
+		fmt.Println("Invalid input.")
+		prompt()
+	}
+}
+
+func startTracking() {
 	tm.Clear()
 
 	for {
-		ui := tm.NewBox(50|tm.PCT, 18, 0)
+		ui := tm.NewBox(57, (len(coins)*2)+6, 0)
 
-		fmt.Fprintln(ui, " Pair       Price        1hr       24hr      7d     ")
-		fmt.Fprintln(ui, " -------------------------------------------------- ")
-		fmt.Fprintln(ui, "                                                    ")
+		fmt.Fprintln(ui, " PAIR       PRICE       1HR%       1D%       7D%     ")
+		fmt.Fprintln(ui, " ___________________________________________________ ")
+		fmt.Fprintln(ui, "                                                     ")
 		for _, coin := range coins {
 			lc := getlastClose(coin)
 			wc := getWeekClose(coin)
@@ -39,17 +45,19 @@ func main() {
 			dpp := get24hrPercent(coin)
 			hpp := getDif(price, lc, 3)
 			wpp := getDif(price, wc, 2)
-			fmt.Fprintf(ui, " %v  %v    %v    %v    %v \n", coin, price, hpp, dpp, wpp)
+			fmt.Fprintf(ui, " %-8s   %-8s   %v    %v    %v \n", coin, fmt.Sprint(price), hpp, dpp, wpp)
 			fmt.Fprintln(ui, "                                                    ")
 		}
+		fmt.Fprintf(ui, " Currently tracking %v coins. Press Ctrl+C to quit.", len(coins))
 
 		tm.Print(tm.MoveTo(ui.String(), 1|tm.PCT, 5|tm.PCT))
 
 		tm.Flush()
 
 		time.Sleep(time.Second * 3)
-
-		// addCoin()
-		// deleteCoin()
 	}
+}
+
+func main() {
+	prompt()
 }

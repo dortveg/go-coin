@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-var coins = []string{"BTCUSDT", "ETHUSDT", "NANOUSDT", "XMRUSDT", "LINKUSDT"}
+var coins = []string{}
 
 func addCoin() {
 	var input string
@@ -16,6 +16,7 @@ func addCoin() {
 	coin := strings.ToUpper(pairing)
 
 	coins = append(coins, coin)
+	prompt()
 }
 
 func indexOf(shitCoin string, coins []string) int {
@@ -37,6 +38,8 @@ func deleteCoin() {
 	index := indexOf(coin, coins)
 	if index != -1 {
 		coins = append(coins[:index], coins[index+1:]...)
+		fmt.Println("Coin deleted.")
+		prompt()
 	} else {
 		fmt.Println("Input does not match any coins, try again.")
 		deleteCoin()

@@ -64,21 +64,21 @@ func getDif(cur float64, prev float64, dp int) string {
 	if dp == 3 {
 		if dif > 0 {
 			p := dif * 100
-			st := fmt.Sprintf("%v+%0.3f", green, p)
+			st := fmt.Sprintf("%v+%0.3f%%", green, p)
 			return (st + white)
 		} else {
 			p := dif * 100
-			st := fmt.Sprintf("%v%0.3f", red, p)
+			st := fmt.Sprintf("%v%0.3f%%", red, p)
 			return (st + white)
 		}
 	} else {
 		if dif > 0 {
 			p := dif * 100
-			st := fmt.Sprintf("%v+%0.2f", green, p)
+			st := fmt.Sprintf("%v+%0.2f%%", green, p)
 			return (st + white)
 		} else {
 			p := dif * 100
-			st := fmt.Sprintf("%v%0.2f", red, p)
+			st := fmt.Sprintf("%v%0.2f%%", red, p)
 			return (st + white)
 		}
 	}
@@ -109,10 +109,10 @@ func get24hrPercent(pair string) string {
 	pcpStr := strings.TrimPrefix(conv2[2], "priceChangePercent:")
 	pcp, _ := strconv.ParseFloat(pcpStr, 64)
 	if pcp > 0 {
-		cpp := fmt.Sprintf("%v+%0.2f", green, pcp)
+		cpp := fmt.Sprintf("%v+%0.2f%%", green, pcp)
 		return (cpp + white)
 	} else {
-		cpp := fmt.Sprintf("%v%0.2f", red, pcp)
+		cpp := fmt.Sprintf("%v%0.2f%%", red, pcp)
 		return (cpp + white)
 	}
 }
