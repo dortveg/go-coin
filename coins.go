@@ -15,8 +15,14 @@ func addCoin() {
 	pairing := strings.TrimSpace(input)
 	coin := strings.ToUpper(pairing)
 
-	coins = append(coins, coin)
-	prompt()
+	test := getPrice(coin)
+	if test == 0 {
+		fmt.Println("Wrong input, try again.")
+		addCoin()
+	} else {
+		coins = append(coins, coin)
+		prompt()
+	}
 }
 
 func indexOf(shitCoin string, coins []string) int {
