@@ -15,13 +15,30 @@ func addCoin() {
 	pairing := strings.TrimSpace(input)
 	coin := strings.ToUpper(pairing)
 
-	test := getPrice(coin)
-	if test == 0 {
-		fmt.Println("Wrong input, try again.")
-		addCoin()
+	if !contains(coin, coins) {
+		test := getPrice(coin)
+		if test == 0 {
+			fmt.Println("Wrong input, try again.")
+			addCoin()
+		} else {
+			coins = append(coins, coin)
+			var in string
+			fmt.Print("Coin added. Add more? Type 'y' or 'n':")
+			fmt.Scanln(&in)
+			trm := strings.TrimSpace(in)
+			choice := strings.ToUpper(trm)
+			if choice == "Y" {
+				addCoin()
+			} else if choice == "N" {
+				prompt()
+			} else {
+				fmt.Println("Wrong input, going back home.")
+				prompt()
+			}
+		}
 	} else {
-		coins = append(coins, coin)
-		prompt()
+		fmt.Println("Pairing already added.")
+		addCoin()
 	}
 }
 
@@ -32,6 +49,15 @@ func indexOf(shitCoin string, coins []string) int {
 		}
 	}
 	return -1
+}
+
+func contains(pair string, coins []string) bool {
+	for _, coin := range coins {
+		if pair == coin {
+			return true
+		}
+	}
+	return false
 }
 
 func deleteCoin() {
